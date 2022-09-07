@@ -9,7 +9,11 @@ const scrapeData = async() => {
         const header = iniciarUsuario();
                 
         //Puppeteer initialization and configuration
-        const browser = await puppeteer.launch({ headless: false, defaultViewport: { width:1920, height:1080 } });
+        const browser = await puppeteer.launch({ 
+            headless: false,
+            slowMo: 250,
+            defaultViewport: { width:1920, height:1080 } 
+        });
         const page = await browser.newPage();
 
         //Simulamos la visita de usuario a pagina, mandando el UserAgent
@@ -66,7 +70,7 @@ const getPopularDishes = async(page) => {
 
         //Formateado
         return [
-            { sourceUri: Uri, alias: 'yelp(app)' }, //[0] => Source
+            { sourceUri: Uri, alias: 'yelp(app)', product: 'platillos populares' }, //[0] => Source
             { name: _PopularDishes[1], price: _PopularDishes[0] }, 
             { name: _PopularDishes[3], price: _PopularDishes[2] }, 
             { name: _PopularDishes[5], price: _PopularDishes[4] }
@@ -81,51 +85,49 @@ const getPopularDishes = async(page) => {
 //Fuente dos
 const getMenu = async(page) => {
     const Uri = 'https://postmates.com/store/dagabi-tapas-bar/hEjxXuetRpyI05bxBEOMfw?utm_source=GooglePMAX&utm_campaign=CM2152901-search-googlepmax-googlepmax_1_-99_US-National_pm-e_web_acq_cpc_en_PMax______c&campaign_id=15552588681&adg_id=&fi_id=&match=&net=x&dev=c&dev_m=&ad_id=&cre=&kwid=&kw=&placement=&tar=&gclid=Cj0KCQjwjIKYBhC6ARIsAGEds-KxD03YFv-L1m0MotbRH5U9u4_YKMPtQOv7gDhesjljGi4Y4OXkYb4aAhRcEALw_wcB&gclsrc=aw.ds';
-    const _products = [];
-
     try {
         //Open
         await page.goto(Uri);
 
-        //[0] => Source
-        _products.push({ sourceUri: Uri, alias: 'postmates(app)' });
-
         //
-        await page.waitForSelector('[role="dialog"]');
+        await page.waitForSelector('input[id="location-typeahead-location-manager-input"]');
 
         //Cerramos pop-up de inicio
-        await page.click('div.fg.ao.ij.db.ik button.ah.cg.is.it.ik.iu.bh.bi.be.gq.b0.dc.fb.iv');
-
-        // 
-        await page.waitForSelector('#main-content');
+        await page.click('[aria-label="Close"]');
 
         //Scrap
         let _Productos = await page.evaluate(() => {
-            const _section = document.querySelectorAll('div.hn.ho.h9.ba.hp.ax');
-            const _name = document.querySelectorAll('ul.hq.hr.hs.ht.hu.hv.il.hx div.ba.c7.bb.c8.c9.ax span');
-            const _price = document.querySelectorAll('ul.hq.hr.hs.ht.hu.hv.il.hx div.i9.ah.f3.ia span');
-            const _description = document.querySelectorAll('ul.hq.hr.hs.ht.hu.hv.il.hx div.i9.id.ie.if.cj.ig.c6 span');
+            const _Conteiners = document.querySelectorAll('ul.h8.dm.bw li.h9.ha');
 
-            
-            for(let i=0; i<_section.length; i++)
-            {
-                const section = _section[i].innerText;
-                const name = _name[i].innerText;
-                const price = _price[i].innerText;
-                const description = _description[i].innerText;
+            const _productos = [];
+            //Iterar array de _Containers[HTMLDom]
+            for(let Container of _Conteiners){
+                const seccion = Container.querySelector('div.hb.hc.gx.ba.hd.ax').innerText;
 
-                console.log({ name, price, description, section });
+                //Sub-contenedores
+                const _SubConteiners = Container.querySelectorAll('ul.he.hf.hg.hh.hi.hj.i9.hl li.hm.hn.ho.hp.hq.hr.hs.ht');
 
-                //
-                _products.push({ name, price, description, section });
+                //Iterar array de _SubConteiners[HTMLDom]
+                for(let SubContainer of _SubConteiners){
+                    const nombre = SubContainer.querySelector('div.ba.c7.bb.c8.c9.ax span').innerText;
+                    const precio = SubContainer.querySelector('div.hx.ah.eo.hy span.hz.gf.i0.ba.bz.dp.c0.c1.ax').innerText;
+                    const descripcion = SubContainer.querySelector('div.ba.bz.dp.c0.c1.ax span.i5').innerText;
+
+                    //
+                    _productos.push({ seccion, nombre, precio, descripcion });
+                }
             }
-            return _products;
+
+            return _productos;
         });
 
-        console.log(_Productos);
+        //Alterar [_Productos] para poner la Uri-Source al inicio
+        _Productos.unshift({ sourceUri: Uri, alias: 'postmates(app)', product: 'menu' })
+
+        return _Productos;
     } 
     catch(error){
-        
+        console.log(error);
     }
 }
 
