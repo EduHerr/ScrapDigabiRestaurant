@@ -10,7 +10,6 @@ const scrapeData = async() => {
                 
         //Puppeteer initialization and configuration
         const browser = await puppeteer.launch({ 
-            headless: false,
             slowMo: 250,
             defaultViewport: { width:1920, height:1080 } 
         });
@@ -19,12 +18,14 @@ const scrapeData = async() => {
         //Simulamos la visita de usuario a pagina, mandando el UserAgent
         await page.setUserAgent(header);
 
-        //
-        // await getPopularDishes(page);
-        await getMenu(page);
+        //Scrapping - GetData
+        const _popularDishes = await getPopularDishes(page);
+        const _menu = await getMenu(page);
 
         //Close
         await browser.close();
+
+        return [_popularDishes, _menu];
     }
     catch(e){
         console.log(e);
@@ -52,6 +53,8 @@ const getPopularDishes = async(page) => {
         //Open
         await page.goto(Uri);
 
+        writeEvent('Uri visitada: '+Uri);
+
         //
         await page.waitForSelector('#main-content');
         
@@ -68,16 +71,18 @@ const getPopularDishes = async(page) => {
             return contenido;
         });
 
+        //
+        writeEvent('Scrapin yelp(app) ends');
+
         //Formateado
         return [
             { sourceUri: Uri, alias: 'yelp(app)', product: 'platillos populares' }, //[0] => Source
-            { name: _PopularDishes[1], price: _PopularDishes[0] }, 
-            { name: _PopularDishes[3], price: _PopularDishes[2] }, 
-            { name: _PopularDishes[5], price: _PopularDishes[4] }
+            { nombre: _PopularDishes[1], precio: _PopularDishes[0] }, 
+            { nombre: _PopularDishes[3], precio: _PopularDishes[2] }, 
+            { nombre: _PopularDishes[5], precio: _PopularDishes[4] }
         ];
     }
     catch(e){
-        console.log(e);
         throw e;
     }
 }
@@ -88,6 +93,8 @@ const getMenu = async(page) => {
     try {
         //Open
         await page.goto(Uri);
+
+        writeEvent('Uri visitada: '+Uri);
 
         //
         await page.waitForSelector('input[id="location-typeahead-location-manager-input"]');
@@ -124,10 +131,12 @@ const getMenu = async(page) => {
         //Alterar [_Productos] para poner la Uri-Source al inicio
         _Productos.unshift({ sourceUri: Uri, alias: 'postmates(app)', product: 'menu' })
 
+        writeEvent('Scrapin ends: '+_Productos[0].alias);
+
         return _Productos;
     } 
-    catch(error){
-        console.log(error);
+    catch(e){
+        throw e;
     }
 }
 
