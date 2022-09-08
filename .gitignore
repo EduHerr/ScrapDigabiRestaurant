@@ -1,3 +1,4 @@
+/src/backsource/*
 /node_modules
 /utils/loggs/*
 .env

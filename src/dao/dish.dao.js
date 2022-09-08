@@ -13,9 +13,9 @@ const crear = async (data) => {
     }
 }
 
-const leer = async (data) => {
+const leer = async() => {
     try{
-        const _Dishes = await Dish.find().exec();
+        const _Dishes = await Dish.find().populate('Source').exec();
         return _Dishes;
     }
     catch(e){

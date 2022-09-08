@@ -9,11 +9,10 @@ const scrapeData = async() => {
         const header = iniciarUsuario();
                 
         //Puppeteer initialization and configuration
-        const browser = await puppeteer.launch({ 
-            slowMo: 250,
-            defaultViewport: { width:1920, height:1080 } 
-        });
-        const page = await browser.newPage();
+        const browser = await puppeteer.launch();
+        const context = await browser.createIncognitoBrowserContext();
+        const page = await context.newPage();
+        await page.setViewport({ width:1920, height:1080 });
 
         //Simulamos la visita de usuario a pagina, mandando el UserAgent
         await page.setUserAgent(header);
@@ -76,7 +75,7 @@ const getPopularDishes = async(page) => {
 
         //Formateado
         return [
-            { sourceUri: Uri, alias: 'yelp(app)', product: 'platillos populares' }, //[0] => Source
+            { uri: Uri, alias: 'yelp(app)', product: 'platillos populares' }, //[0] => Source
             { nombre: _PopularDishes[1], precio: _PopularDishes[0] }, 
             { nombre: _PopularDishes[3], precio: _PopularDishes[2] }, 
             { nombre: _PopularDishes[5], precio: _PopularDishes[4] }
@@ -129,7 +128,7 @@ const getMenu = async(page) => {
         });
 
         //Alterar [_Productos] para poner la Uri-Source al inicio
-        _Productos.unshift({ sourceUri: Uri, alias: 'postmates(app)', product: 'menu' })
+        _Productos.unshift({ uri: Uri, alias: 'postmates(app)', product: 'menu' })
 
         writeEvent('Scrapin ends: '+_Productos[0].alias);
 
