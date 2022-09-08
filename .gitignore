@@ -1,4 +1,5 @@
-/src/backsource/*
+/src/backsource/*.json
+/src/backsource/csv/*.csv
 /node_modules
 /utils/loggs/*
 .env
