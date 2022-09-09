@@ -9,10 +9,14 @@ const scrapeData = async() => {
         const header = iniciarUsuario();
                 
         //Puppeteer initialization and configuration
-        const browser = await puppeteer.launch();
+        const browser = await puppeteer.launch({ 
+            // headless: false,
+            defaultViewport: null,
+            args: ['--disable-setuid-sandbox', '--window-size=1920,1080',],
+	        'ignoreHTTPSErrors': true 
+        });
         const context = await browser.createIncognitoBrowserContext();
         const page = await context.newPage();
-        await page.setViewport({ width:1920, height:1080 });
 
         //Simulamos la visita de usuario a pagina, mandando el UserAgent
         await page.setUserAgent(header);
@@ -61,15 +65,19 @@ const getPopularDishes = async(page) => {
         
         //Scrap
         let _PopularDishes = await page.evaluate(() => {
-            const _containers = document.querySelectorAll('div.css-1uk2nuw div.css-19cdu5a [data-font-weight="bold"]');
+            // const _containers = document.querySelectorAll('div.css-1uk2nuw div.css-19cdu5a [data-font-weight="bold"]');
+            const _container = document.querySelectorAll('a.css-1fliqpp [data-font-weight="bold"]');
             
-            const contenido = [];
-            for(let x=0; x<6; x++)//[Price,Product] => 3 items
+            const _contenido = [];
+            for(const contentProduct of _container)//[Price,Product] => 3 items
             {
-                contenido.push(_containers[x].innerText);
+                // const nombre = contentProduct.querySelector('');
+                // const precio = contentProduct.querySelector('div span[data-font-weight="bold"]').innerText;
+
+                _contenido.push(contentProduct.innerText);
             }
 
-            return contenido;
+            return _contenido;
         });
 
         //
