@@ -5,7 +5,8 @@ const dishSchema = new Schema({
     seccion: { type: String, default: null },
     precio: { type: String, default: null },
     descripcion: { type: String, default: null },
-    Source: { type: Schema.Types.ObjectId, ref:'Source' }
+    Source: { type: Schema.Types.ObjectId, ref:'Source' },
+    created_at: { type: Date, default: new Date() },
 });
 
 module.exports = model('Dish', dishSchema);

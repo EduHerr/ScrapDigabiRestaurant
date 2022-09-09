@@ -9,7 +9,7 @@ const scrapeData = async() => {
         const header = iniciarUsuario();
                 
         //Puppeteer initialization and configuration
-        const browser = await puppeteer.launch({ headless: false });
+        const browser = await puppeteer.launch();
         const context = await browser.createIncognitoBrowserContext();
         const page = await context.newPage();
         await page.setViewport({ width:1920, height:1080 });
@@ -18,7 +18,7 @@ const scrapeData = async() => {
         await page.setUserAgent(header);
 
         //Scrapping - GetData
-        // const _popularDishes = await getPopularDishes(page);
+        const _popularDishes = await getPopularDishes(page);
         const _menu = await getMenu(page);
 
         //Close
@@ -54,8 +54,10 @@ const getPopularDishes = async(page) => {
 
         writeEvent('Uri visitada: '+Uri);
 
+        await page.waitForTimeout(5000);
+
         //
-        await page.waitForSelector('#main-content');
+        await page.waitForSelector('main[id="main-content"]');
         
         //Scrap
         let _PopularDishes = await page.evaluate(() => {
@@ -95,13 +97,10 @@ const getMenu = async(page) => {
 
         writeEvent('Uri visitada: '+Uri);
 
-        await page.waitForTimeout(7000);
+        await page.waitForTimeout(4000);
 
         //
-        // await page.waitForSelector('input[id="location-typeahead-location-manager-input"]');
-
-        // //Cerramos pop-up de inicio
-        // await page.click('[aria-label="Close"]');
+        await page.waitForSelector('main[id="main-content"]');
 
         //Scrap
         let _Productos = await page.evaluate(() => {
