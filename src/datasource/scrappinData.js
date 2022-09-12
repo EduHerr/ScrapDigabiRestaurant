@@ -71,9 +71,6 @@ const getPopularDishes = async(page) => {
             const _contenido = [];
             for(const contentProduct of _container)//[Price,Product] => 3 items
             {
-                // const nombre = contentProduct.querySelector('');
-                // const precio = contentProduct.querySelector('div span[data-font-weight="bold"]').innerText;
-
                 _contenido.push(contentProduct.innerText);
             }
 
@@ -108,20 +105,18 @@ const getMenu = async(page) => {
         await page.waitForTimeout(4000);
 
         //
-        await page.waitForSelector('main[id="main-content"]');
+        await page.waitForSelector('main.dm');
 
-        //Validar existencia del -pop_up-
-        await page.evaluate(() => {
-            //
+        //Scrap
+        let _Productos = await page.evaluate(() => {
+            //Cerrar pop-up
             const closeButton = document.querySelector('[aria-label="Close"]');
             
             if(closeButton != null && typeof closeButton != 'undefined'){
                 closeButton.click();
             }
-        });
 
-        //Scrap
-        let _Productos = await page.evaluate(() => {
+            //Extraer data de los containers
             const _Conteiners = document.querySelectorAll('ul.h8.dm.bw li.h9.ha');
 
             const _productos = [];
