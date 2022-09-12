@@ -10,7 +10,7 @@ const scrapeData = async() => {
                 
         //Puppeteer initialization and configuration
         const browser = await puppeteer.launch({ 
-            headless: false,
+            // headless: false,
             defaultViewport: null,
             args: ['--disable-setuid-sandbox', '--window-size=1920,1080',],
 	        'ignoreHTTPSErrors': true 
@@ -124,18 +124,20 @@ const getMenu = async(page) => {
             for(let Container of _Conteiners){
                 const seccion = Container.querySelector('div.hb.hc.gx.ba.hd.ax').innerText;
 
-                //Sub-contenedores
-                const _SubConteiners = Container.querySelectorAll('ul.he.hf.hg.hh.hi.hj.i9.hl li.hm.hn.ho.hp.hq.hr.hs.ht');
+                _productos.push(seccion);
 
-                //Iterar array de _SubConteiners[HTMLDom]
-                for(let SubContainer of _SubConteiners){
-                    const nombre = SubContainer.querySelector('div.ba.c7.bb.c8.c9.ax span').innerText;
-                    const precio = SubContainer.querySelector('div.hx.ah.eo.hy span.hz.gf.i0.ba.bz.dp.c0.c1.ax').innerText;
-                    const descripcion = SubContainer.querySelector('div.ba.bz.dp.c0.c1.ax span.i5').innerText;
+                // //Sub-contenedores
+                // const _SubConteiners = Container.querySelectorAll('ul.he.hf.hg.hh.hi.hj.i9.hl li.hm.hn.ho.hp.hq.hr.hs.ht');
 
-                    //
-                    _productos.push({ seccion, nombre, precio, descripcion });
-                }
+                // //Iterar array de _SubConteiners[HTMLDom]
+                // for(let SubContainer of _SubConteiners){
+                //     const nombre = SubContainer.querySelector('div.ba.c7.bb.c8.c9.ax span').innerText;
+                //     const precio = SubContainer.querySelector('div.hx.ah.eo.hy span.hz.gf.i0.ba.bz.dp.c0.c1.ax').innerText;
+                //     const descripcion = SubContainer.querySelector('div.ba.bz.dp.c0.c1.ax span.i5').innerText;
+
+                //     //
+                //     _productos.push({ seccion, nombre, precio, descripcion });
+                // }
             }
 
             return _productos;
