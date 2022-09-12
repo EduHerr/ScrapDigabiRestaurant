@@ -10,7 +10,7 @@ const scrapeData = async() => {
                 
         //Puppeteer initialization and configuration
         const browser = await puppeteer.launch({ 
-            // headless: false,
+            headless: false,
             defaultViewport: null,
             args: ['--disable-setuid-sandbox', '--window-size=1920,1080',],
 	        'ignoreHTTPSErrors': true 
@@ -109,6 +109,16 @@ const getMenu = async(page) => {
 
         //
         await page.waitForSelector('main[id="main-content"]');
+
+        //Validar existencia del -pop_up-
+        await page.evaluate(() => {
+            //
+            const closeButton = document.querySelector('[aria-label="Close"]');
+            
+            if(closeButton != null && typeof closeButton != 'undefined'){
+                closeButton.click();
+            }
+        });
 
         //Scrap
         let _Productos = await page.evaluate(() => {
