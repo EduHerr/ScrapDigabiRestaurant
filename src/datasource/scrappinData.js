@@ -105,7 +105,7 @@ const getMenu = async(page) => {
         await page.waitForTimeout(4000);
 
         //
-        await page.waitForSelector('main.dm');
+        await page.waitForSelector('main[id="main-content"]');
 
         //Scrap
         let _Productos = await page.evaluate(() => {
